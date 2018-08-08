@@ -1,2 +1,2 @@
-# Project-1-Local-vs-global-temps
+# Data_Analyst_Nanodegree_Udacity
 Analysis of local versus global temperature annual average temperatures
