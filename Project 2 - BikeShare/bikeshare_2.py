@@ -2,13 +2,14 @@ import PyQt5
 import matplotlib.pyplot as plt
 import time
 import pandas as pd
+from pandas import DataFrame as df
 import numpy as np
 import calendar
 
 class Bikeshare:
     print()
     print('Hello, we will explore bikeshare data from three US cities. Let\'s do it! \n')
-
+    
     def __init__(self):
         self.city_data = { '1': 'chicago.csv',
                      '2': 'new_york_city.csv',
@@ -16,7 +17,7 @@ class Bikeshare:
 
         self.cities = {'Chicago':'1', 'New York': '2', 'Washington': '3'}
         self.months = {'January':'1', 'February':'2', 'March':'3', 'April':'4','May':'5', 'June':'6', 'All':'7'}
-        self.days = {'Monday':'0', 'Tuesday':'1', 'Wednesday':'2', 'Thursday':'3',
+        self.days = {'Monday':'0', 'Tuesday':'1', 'Wednesday':'2', 'Thursday':'3', 
                          'Friday':'4', 'Saturday':'5', 'Sunday':'6', 'All':'7'}
 
     def filter_load_data(self):
@@ -37,37 +38,43 @@ class Bikeshare:
                 except:
                     pass
         while True:
+            print()
             month = input('Choose your month -- Jan = 1, Feb = 2, Mar = 3, Apr = 4, May = 5, June = 6, All = 7: \n').capitalize()
             if month not in self.months.values():
                     print(err_msg)
             else:
-                try:
+                try: 
                     if month != str(7):
                         print('You chose', calendar.month_name[int(month)])
                         print()
+                    else:
+                        print("You chose 'All'")
                     break
-                except:
+                except: 
                     print(err_msg)
         while True:
+            print()
             day = input('Choose your day -- Mon = 0, Tues = 1, Wed = 2, Thur = 3, Fri = 4, Sat = 5, Sun = 6, All = 7: \n').capitalize()
             if day not in self.days.values():
                     print(err_msg)
             else:
-                try:
+                try: 
                     if day != str(7):
                         print('You chose', calendar.day_name[int(day)])
+                    else: 
+                        print("You chose 'All'")
                     break
-                except:
+                except: 
                     print(err_msg)
-
+    
         month = int(month)
         day = int(day)
-
+        
         # loads data file into a dataframe
         df = pd.read_csv(self.city_data[city])
 
         #change name of user column from 'Unnamed: 0' to 'User Id'
-        column_rename = df.columns.values
+        column_rename = df.columns.values 
         column_rename[0] = 'User Id'
         df.columns = column_rename
 
@@ -76,6 +83,7 @@ class Bikeshare:
         df['End Time'] = pd.to_datetime(df['End Time'])
 
         # extracts month, day of the week, and hour from Start Time to create new columns
+        df['year'] = df['Start Time'].dt.year
         df['month'] = df['Start Time'].dt.month
         df['day_of_week'] = df['Start Time'].dt.dayofweek
         df['start hour'] = df['Start Time'].dt.hour
@@ -84,7 +92,7 @@ class Bikeshare:
         # filter by month if applicable
         if month != 7:
             # use the index of the months list to get the corresponding int
-            months = list(range(1,8))
+            months = list(range(1,8)) 
             month = months.index(month) + 1
 
             # filter by month to create the new dataframe
@@ -95,18 +103,22 @@ class Bikeshare:
             # filter by day of week to create the new dataframe
             df = df[df['day_of_week'].values == day]
 
-        return city, month, day, df
-
-    def stats(self, df):
+        return city, month, day, df 
+    
+    def stats(self, df):  
 ############################################### Time Stats ########################################################
         print(str('\nCalculating The Most Frequent Times of Travel...\n').upper())
         start_time = time.time()
-
+        year = df['year'].min()
+       
+        print('All data from year:', year)
+        print()
         # Displays the most common month
         month_mode = df['month'].mode()[0]
         month_counts = df['month'].value_counts().reset_index()
 
         if month == 7:
+            print('Number of users each month: ')
             print(month_counts.to_string(header = None, index = None))
             print()
             print('The most common month:', calendar.month_name[month_mode])
@@ -164,8 +176,11 @@ class Bikeshare:
 
         # TO DO: display most frequent combination of start station and end station trip
         loc_combo_mode = max(df.groupby(['Start Station', 'End Station']).size().index)
-        print('Most frequent combination of Start and End stations -- START: %s, END: %s '  % (loc_combo_mode[0], loc_combo_mode[1]))
-
+        print('Most popular trip -- FROM: %s, TO: %s '  % (loc_combo_mode[0], loc_combo_mode[1]))
+        print()
+        least_pop_trip = min(df.groupby(['Start Station', 'End Station']).size().index)
+        print('Least popular trip -- FROM %s, TO: %s' % (least_pop_trip[0], least_pop_trip[1]))
+        print()
         print("\nThis took %s seconds." % (time.time() - start_time))
         print('-'*40)
 
@@ -174,23 +189,30 @@ class Bikeshare:
         start_time = time.time()
 
         # TO DO: display total travel time
-        total_time = df['Trip Duration'].sum()
-        print('Total travel time: %s hours %s minutes %s seconds' % (total_time//3600, total_time%3600//60, total_time%3600%60))
+        total_time = df['Trip Duration'].sum() 
+        print('Total travel time: %s hours %s minutes %s seconds' % (total_time//3600, total_time%3600//60, 
+                                                                     total_time%3600%60))
         print()
 
         # TO DO: display mean travel time
         time_avg = df['Trip Duration'].mean()
-        print('Travel time average: %s seconds' % (time_avg))
+        print('Travel time average: %s minutes %.2f seconds' % (time_avg//60, time_avg%60))
+        print()
+        
+        #Displays the median travel time to get a better idea of central tendency
+        time_median = df['Trip Duration'].median()
+        print('Travel time median: %s minutes %.2f seconds' % (time_median//60, time_median%60))
         print()
 
         #Displays maximum trip duration
         time_max = df['Trip Duration'].max()
-        print('Longest trip duration: %s seconds' % (time_max))
+        print('Longest trip: %s hours %s minutes %s seconds' % (time_max//3600, time_max%3600//60, 
+                                                                time_max%3600%60))
         print()
 
         #Displays minimum trip duration
         time_min = df['Trip Duration'].min()
-        print('Shortest trip duration: %s seconds' % (time_min))
+        print('Shortest trip: %s seconds' % (time_min))
         print()
 
 
@@ -201,7 +223,7 @@ class Bikeshare:
         print(str('\nCalculating User Stats...\n').upper())
         start_time = time.time()
 
-        # TO DO: Display counts of user types
+        # TO DO: Display counts of user types 
         user_type = df['User Type'].value_counts().reset_index()
         print('User type counts:\n\n', user_type.to_string(header=None, index=None))
         print()
@@ -210,9 +232,9 @@ class Bikeshare:
         customer = df['User Type'].value_counts()[1]
         percent_subscriber = (subscriber/(subscriber + customer))*100
         percent_customer = (customer/(customer + subscriber))*100
-        print('Percentage of users as subscribers: {}%'.format(percent_subscriber))
+        print('Percentage of users as subscribers: {0:.2f}%'.format(percent_subscriber))
         print()
-        print('Percentage of users as customers: {}%'.format(percent_customer))
+        print('Percentage of users as customers: {0:.2f}%'.format(percent_customer))
         print()
         user_type_counts.plot(kind='pie', title='User Type').set_ylabel('')
         plt.show()
@@ -227,9 +249,9 @@ class Bikeshare:
             female = gender_counts[1]
             percentage_male = (male/(male + female))*100
             percentage_female = (female/(female + male))*100
-            print('Percentage of users as males: %s percent' % (percentage_male))
+            print('Percentage of users as males: {0:.2f}%'.format(percentage_male))
             print()
-            print('Percentage of users as females: %s percent' % (percentage_female))
+            print('Percentage of users as females: {0:.2f}%'.format(percentage_female))
             print()
             gender_counts.plot(kind='pie', title='Gender').set_ylabel('')
             plt.show()
@@ -251,17 +273,19 @@ class Bikeshare:
             print()
             earliest_birthYear = df['Birth Year'].min()
             print('Earliest birth year:', int(earliest_birthYear))
+            df['Birth Year'].plot(kind='hist', title='Birth Year Histogram')
+            plt.show()
         except KeyError:
             print('Washington has no birth year data')
 
         print("\nThis took %s seconds." % (time.time() - start_time))
         print('-'*40)
-
+            
 def main():
     while True:
         city, month, day, df = Bikeshare().filter_load_data()
         Bikeshare().stats(df)
-
+        
         while True:
             valid_responses = ['Y', 'N']
             restart = input('\nWould you like to restart? Enter Y or N.\n').capitalize()
@@ -270,13 +294,13 @@ def main():
             elif restart == 'Y':
                 city, month, day, df = Bikeshare().filter_load_data()
                 Bikeshare().stats(df)
-
+                
             elif restart != 'Y':
                 #print('Bye!')
                 #tts('Goodbye','goodbye')
                 print('Goodbye')
                 break
         break
-
+            
 if __name__ == "__main__":
 	main()
