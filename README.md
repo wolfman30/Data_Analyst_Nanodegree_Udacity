@@ -1,2 +1,2 @@
 # Data_Analyst_Nanodegree_Udacity
-Analysis of local versus global temperature annual average temperatures
+So far 1 project is complete. Project 2 - Bikeshare still needs reviewed. 
