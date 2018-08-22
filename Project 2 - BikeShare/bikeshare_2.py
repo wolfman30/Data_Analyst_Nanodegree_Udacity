@@ -4,6 +4,7 @@ import pandas as pd
 from pandas import DataFrame as df
 import numpy as np
 import calendar
+import seaborn as sb
 
 class Data_prep:
 
@@ -25,7 +26,7 @@ class Data_prep:
         self.days = {'Monday':'0', 'Tuesday':'1', 'Wednesday':'2', 'Thursday':'3', 
                          'Friday':'4', 'Saturday':'5', 'Sunday':'6', 'All':'7'}
         
-        err_msg = 'Invalid, try again...'
+        self.err_msg = 'Invalid, try again...'
 
     def filter_city(self):  #this method filters and returns the city
         global city
@@ -40,7 +41,7 @@ class Data_prep:
             else:
                 try:
                     print()
-                    print(err_msg)
+                    print(self.err_msg)
 
                 except:
                     pass
@@ -54,7 +55,7 @@ class Data_prep:
             print()
             month = input('Choose your month -- Jan = 1, Feb = 2, Mar = 3, Apr = 4, May = 5, June = 6, All = 7: \n').capitalize()
             if month not in self.months.values():
-                    print(err_msg)
+                    print(self.err_msg)
             else:
                 try: 
                     if month != str(7):
@@ -64,7 +65,7 @@ class Data_prep:
                         print("You chose 'All'")
                     break
                 except: 
-                    print(err_msg)
+                    print(self.err_msg)
 
         month = int(month) #prefer to keep all inputs numerical so use convert the output to integer
 
@@ -77,7 +78,7 @@ class Data_prep:
             print()
             day = input('Choose your day -- Mon = 0, Tues = 1, Wed = 2, Thur = 3, Fri = 4, Sat = 5, Sun = 6, All = 7: \n').capitalize()
             if day not in self.days.values():
-                    print(err_msg)
+                    print(self.err_msg)
             else:
                 try: 
                     if day != str(7):
@@ -86,7 +87,7 @@ class Data_prep:
                         print("You chose 'All'")
                     break
                 except: 
-                    print(err_msg)
+                    print(self.err_msg)
 
         day = int(day)
 
@@ -164,6 +165,7 @@ class Stats(Data_prep):
     """this class bundles together all statistics about time(months, days, and hours), start and end stations,
     trip durations, and statistics about the user such as gender, birth year, and user type"""
     
+    
     def time(self, df): #this method gets the data from the chosen month and day, and gathers data of users for each hour 
 
         print(str('\nCalculating The Most Frequent Times of Travel...\n').upper())
@@ -176,6 +178,8 @@ class Stats(Data_prep):
         month_mode = df['month'].mode()[0]
         month_counts = df['month'].value_counts().reset_index()
 
+        base_color = sb.color_palette()[0]#the color for all the seaborn bar plots
+        
         if month == 7:
             print('Number of users each month: \n')
             print(month_counts.to_string(header = None, index = None))
@@ -185,8 +189,11 @@ class Stats(Data_prep):
             month_counts = df['month'].value_counts(ascending=True)
 
             #visualizes the number of users per month
-            month_counts.plot(title='Number of Users per Month', kind='bar', legend = False)
+            #month_counts.plot(title='Number of Users per Month', kind='bar', legend = False)
+            #plt.show()
+            sb.countplot(data=df, x='month', order=['Jan', 'Feb','Mar','Apr','May','Jun'], color=base_color);
             plt.show()
+            
 
         # Displays the most common day of week
         day_mode = df['day_of_week'].mode()[0]
@@ -199,7 +206,9 @@ class Stats(Data_prep):
             day_counts = df['day_of_week'].value_counts(ascending=True)
 
             #visualizes the number of users per day
-            day_counts.plot(title='Users per Day', kind='bar', legend = False)
+            #day_counts.plot(title='Users per Day', kind='bar', legend = False)
+            #plt.show()
+            sb.countplot(data=df, x='day_of_week', order=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], color=base_color);
             plt.show()
 
         # Displays the most common start hour of the day
@@ -227,7 +236,9 @@ class Stats(Data_prep):
         hour_counts = df['start hour'].value_counts(ascending=True)
         print('Counts of users during each hour: \n')
         print(hour_counts.to_string(header = None, index = None))
-        hour_counts.plot(x = 'hour', title='Users Per Hour', kind='bar', legend = False)
+        #hour_counts.plot(x = 'hour', title='Users Per Hour', kind='bar', legend = False)
+        #plt.show()
+        sb.countplot(data=df, x='start hour', color=base_color);
         plt.show()
 
         print("\nThis took %s seconds." % (time.time() - start_time))
