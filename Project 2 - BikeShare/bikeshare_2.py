@@ -322,10 +322,15 @@ class Stats(Data_prep):
         print()
 
         #visualizes the percentages of customers and subscribers in a pie chart for better comparison
-        user_type_counts.plot(kind='pie', title='User Type', autopct='%1.0f%%').set_ylabel('')
+        sorted_counts = df['User Type'].value_counts()
+        _, _, autotexts = plt.pie(sorted_counts[:2], labels = sorted_counts.index[:2], autopct='%1.1f%%', startangle = 90,
+                colors = [sb.color_palette()[0], sb.color_palette()[3]], counterclock = False);
+        for autotext in autotexts:
+            autotext.set_color('white')
+        plt.axis('square')
         plt.show()
         print()
-        sb.countplot(data=df, x='User Type');
+        sb.countplot(data=df, x='User Type', palette=[sb.color_palette()[0], sb.color_palette()[3]]);
         plt.show()
         print()
 
@@ -348,10 +353,15 @@ class Stats(Data_prep):
             print()
 
             #visualizes the percentages of users as female and male as a pie chart
-            gender_counts.plot(kind='pie', title='Gender', autopct='%1.0f%%').set_ylabel('')
+            sorted_counts = df['Gender'].value_counts()
+            _, _, autotexts = plt.pie(sorted_counts, labels = sorted_counts.index, autopct='%1.1f%%', startangle = 90,
+                    colors = [sb.color_palette()[0], sb.color_palette()[3]], counterclock = False);
+            for autotext in autotexts:
+                autotext.set_color('white')
+            plt.axis('square')
             plt.show()
             print()
-            sb.countplot(data=df, x='Gender');
+            sb.countplot(data=df, x='Gender', palette=[sb.color_palette()[0], sb.color_palette()[3]]);
             plt.show()
             print()
             gender_userType = df.groupby(['Gender', 'User Type']).size().reset_index()
