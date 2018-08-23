@@ -1,2 +1,2 @@
 # Data_Analyst_Nanodegree_Udacity
-So far 1 project is complete. Project 2 - Bikeshare still needs reviewed. 
+So far Project 1 and Project 2 are complete. Project 3 'Investigate a Dataset' still needs reviewed. 
