@@ -232,10 +232,6 @@ class Stats(Data_prep):
         print('Latest start hour', startHr_max)
         print()
 
-        #Displays and visualizes the number of users for each hour of the day in ascending order
-        hour_counts = df['start hour'].value_counts(ascending=True)
-        print('Counts of users during each hour: \n')
-        print(hour_counts.to_string(header = None, index = None))
         #hour_counts.plot(x = 'hour', title='Users Per Hour', kind='bar', legend = False)
         #plt.show()
         sb.countplot(data=df, x='start hour', color=base_color);
@@ -326,8 +322,12 @@ class Stats(Data_prep):
         print()
 
         #visualizes the percentages of customers and subscribers in a pie chart for better comparison
-        user_type_counts.plot(kind='pie', title='User Type').set_ylabel('')
+        user_type_counts.plot(kind='pie', title='User Type', autopct='%1.0f%%').set_ylabel('')
         plt.show()
+        print()
+        sb.countplot(data=df, x='User Type');
+        plt.show()
+        print()
 
 
         try:
@@ -348,7 +348,10 @@ class Stats(Data_prep):
             print()
 
             #visualizes the percentages of users as female and male as a pie chart
-            gender_counts.plot(kind='pie', title='Gender').set_ylabel('')
+            gender_counts.plot(kind='pie', title='Gender', autopct='%1.0f%%').set_ylabel('')
+            plt.show()
+            print()
+            sb.countplot(data=df, x='Gender');
             plt.show()
             print()
             gender_userType = df.groupby(['Gender', 'User Type']).size().reset_index()
