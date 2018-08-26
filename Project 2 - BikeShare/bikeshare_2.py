@@ -338,7 +338,7 @@ class Stats(Data_prep):
         try:
             #Displays counts of male and female
             gender = df['Gender'].value_counts().reset_index()
-            print('Gender counts:\n\n ', gender.to_string(header=None, index=None))
+            print('Gender counts: \n', gender.to_string(header=None, index=None))
             print()
             gender_counts = df['Gender'].value_counts()
             male = gender_counts[0]
@@ -365,7 +365,9 @@ class Stats(Data_prep):
             plt.show()
             print()
             gender_userType = df.groupby(['Gender', 'User Type']).size().reset_index()
+            print('Gender-User_Type Combo Counts:')
             print(gender_userType.to_string(header=None, index=None))
+            print()
         except KeyError:
             print('Washington has no gender data')
 
@@ -381,7 +383,9 @@ class Stats(Data_prep):
             print()
             earliest_birthYear = df['Birth Year'].min()
             print('Earliest birth year:', int(earliest_birthYear))
-            df['Birth Year'].plot(kind='hist', title='Birth Year Histogram')
+            
+            plt.hist(data=df, x='Birth Year', bins=np.arange(1930, 2006, 3),
+                    range = (df['Birth Year'].min(), df['Birth Year'].max()+7));
             plt.show()
         except KeyError:
             print('Washington has no birth year data')
