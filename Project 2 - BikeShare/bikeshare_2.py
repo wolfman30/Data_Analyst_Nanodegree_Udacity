@@ -364,9 +364,12 @@ class Stats(Data_prep):
             sb.countplot(data=df, x='Gender', palette=[sb.color_palette()[0], sb.color_palette()[3]]);
             plt.show()
             print()
-            gender_userType = df.groupby(['Gender', 'User Type']).size().reset_index()
-            print('Gender-User_Type Combo Counts:')
-            print(gender_userType.to_string(header=None, index=None))
+            gender_userType = df.groupby(['Gender', 'User Type']).size().reset_index(name='counts')
+            print('Gender-User_Type Combo Counts: \n ')
+            gender_userType = gender_userType.pivot(index = 'Gender', columns = 'User Type', values = 'counts')
+            print(gender_userType)
+            print()
+            sb.heatmap(gender_userType, annot = True, fmt = '.0f');
             print()
         except KeyError:
             print('Washington has no gender data')
